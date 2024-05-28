@@ -18,7 +18,7 @@ const pool = mysql.createPool({
   password: 'Harihara11!+'
 });
 
-app.get('/api/state', (req, res) => {
+app.get('/state', (req, res) => {
   const query = 'SELECT * FROM state';
   pool.query(query, (err, results) => {
     if (err) {
