@@ -2,21 +2,33 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const cors = require('cors');
+require('dotenv').config();
 
-// Enable CORS for all requests
 const app = express();
 app.use(cors());
 
-const port = 3020;
+const port = process.env.PORT || 3020;
 
 // MySQL Connection Pool
 const pool = mysql.createPool({
-  connectionLimit: 10, // Adjust as needed
-  host: 'localhost',
-  user: 'root',
-  database: 'dhan',
-  password: 'Harihara11!+'
+  connectionLimit: 10,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 });
+
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.error('Error connecting to the database:', err);
+  } else {
+    console.log('Connected to the database');
+    connection.release();
+  }
+});
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/api/state', (req, res) => {
   const query = 'SELECT * FROM state';
@@ -98,6 +110,24 @@ app.get('/api/members', (req, res) => {
       res.json(results);
     }
   });
+});
+
+app.post('/submit', (req, res) => {
+  const formData = req.body;
+  const sql = `INSERT INTO myfarmers_data SET ?`;
+  pool.query(sql, formData, (err, result) => {
+    if (err) {
+      console.error('Error saving data:', err);
+      res.status(500).send('Error saving data');
+    } else {
+      console.log('Data added successfully');
+      res.status(200).send('Data added successfully');
+    }
+  });
+});
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
 
 app.use(bodyParser.json());
