@@ -2,22 +2,33 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
-const port = 3020;
+const port = process.env.PORT || 3020;
 
 // MySQL Connection Pool
 const pool = mysql.createPool({
-  connectionLimit: 10, // Adjust as needed
-  host: 'localhost',
-  user: 'root',
-  database: 'dhan',
-  password: 'Harihara11!+'
+  connectionLimit: 10,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 });
+
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.error('Error connecting to the database:', err);
+  } else {
+    console.log('Connected to the database');
+    connection.release();
+  }
+});
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/api/state', (req, res) => {
   const query = 'SELECT * FROM state';
