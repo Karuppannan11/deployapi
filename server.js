@@ -3,9 +3,10 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const cors = require('cors');
 
-// Enable CORS for all requests
 const app = express();
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const port = 3020;
 
@@ -22,7 +23,7 @@ app.get('/api/state', (req, res) => {
   const query = 'SELECT * FROM state';
   pool.query(query, (err, results) => {
     if (err) {
-      console.error('Error fetching states data:', err);
+      console.error('Error fetching states data:', err.code, err.sqlMessage);
       res.status(500).json({ error: 'Error fetching states data' });
     } else {
       res.json(results);
@@ -36,7 +37,7 @@ app.get('/api/district', (req, res) => {
   const query = 'SELECT * FROM district WHERE state_scode = ?';
   pool.query(query, [state_scode], (err, results) => {
     if (err) {
-      console.error('Error fetching districts data:', err);
+      console.error('Error fetching districts data:', err.code, err.sqlMessage);
       res.status(500).json({ error: 'Error fetching districts data' });
     } else {
       res.json(results);
@@ -50,7 +51,7 @@ app.get('/api/location', (req, res) => {
   const query = 'SELECT * FROM location WHERE district_dcode = ?';
   pool.query(query, [district_dcode], (err, results) => {
     if (err) {
-      console.error('Error fetching locations data:', err);
+      console.error('Error fetching locations data:', err.code, err.sqlMessage);
       res.status(500).json({ error: 'Error fetching locations data' });
     } else {
       res.json(results);
@@ -64,7 +65,7 @@ app.get('/api/cluster', (req, res) => {
   const query = 'SELECT * FROM cluster WHERE location_lcode=?';
   pool.query(query, [location_lcode], (err, results) => {
     if (err) {
-      console.error('Error fetching clusters data:', err);
+      console.error('Error fetching clusters data:', err.code, err.sqlMessage);
       res.status(500).json({ error: 'Error fetching clusters data' });
     } else {
       res.json(results);
@@ -78,7 +79,7 @@ app.get('/api/grp', (req, res) => {
   const query = 'SELECT * FROM grp WHERE cluster_ccode=?';
   pool.query(query, [cluster_ccode], (err, results) => {
     if (err) {
-      console.error('Error fetching groups data:', err);
+      console.error('Error fetching groups data:', err.code, err.sqlMessage);
       res.status(500).json({ error: 'Error fetching groups data' });
     } else {
       res.json(results);
@@ -92,7 +93,7 @@ app.get('/api/members', (req, res) => {
   const query = 'SELECT * FROM members WHERE group_gcode=?';
   pool.query(query, [group_gcode], (err, results) => {
     if (err) {
-      console.error('Error fetching members data:', err);
+      console.error('Error fetching members data:', err.code, err.sqlMessage);
       res.status(500).json({ error: 'Error fetching members data' });
     } else {
       res.json(results);
@@ -100,10 +101,6 @@ app.get('/api/members', (req, res) => {
   });
 });
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Submit API
 app.post('/submit', (req, res) => {
   const formData = req.body;
   const sql = `INSERT INTO myfarmers_data 
@@ -146,8 +143,6 @@ app.post('/submit', (req, res) => {
   rateofsales = '${formData.rateofsales}',
   availabilityofMachinery = '${formData.availabilityofMachinery }',
   cropInsurance = '${formData.cropInsurance }',
-
-
   totalAcresinRainfed = '${formData.totalAcresinRainfed}',
   areaofCultivationinRainfed = '${formData.areaofCultivationinRainfed}',
   soilType1 = '${formData.soilType1}',
@@ -165,7 +160,6 @@ app.post('/submit', (req, res) => {
   rateofsales1 = '${formData.rateofsales1}',
   availabilityofMachinery1 = '${formData.availabilityofMachinery1 }',
   cropInsurance1 = '${formData.cropInsurance1 }',
-
   totalAcresinBorewell = '${formData.totalAcresinBorewell}',
   areaofCultivationinBorewell = '${formData.areaofCultivationinBorewell}',
   soilType2 = '${formData.soilType2}',
@@ -183,7 +177,6 @@ app.post('/submit', (req, res) => {
   rateofsales2 = '${formData.rateofsales2}',
   availabilityofMachinery2 = '${formData.availabilityofMachinery2 }',
   cropInsurance2 = '${formData.cropInsurance2 }',
-
   totalAcresinDripOpenWellCanalIrrigation = '${formData.totalAcresinDripOpenWellCanalIrrigation}',
   areaofCultivationinDripOpenWellCanalIrrigation ='${formData.areaofCultivationinDripOpenWellCanalIrrigation}',
   soilType3 = '${formData.soilType3}',
@@ -201,7 +194,6 @@ app.post('/submit', (req, res) => {
   rateofsales3 = '${formData.rateofsales3}',
   availabilityofMachinery3 = '${formData.availabilityofMachinery3 }',
   cropInsurance3 = '${formData.cropInsurance3}',
-
   liveStockDetails = '${formData.liveStockDetails}',
   NoofLivestockCow = '${formData.NoofLivestockCow}',
   VarietyBreadCow = '${formData.VarietyBreadCow}',
@@ -248,8 +240,6 @@ app.post('/submit', (req, res) => {
   AnyseasonaldiseaseoutbreakSheep = '${formData.AnyseasonaldiseaseoutbreakSheep}',
   TreatmentMethodFollowedSheep = '${formData.TreatmentMethodFollowedSheep}',
   LiveStockInsuranceDetails= '${formData.LiveStockInsuranceDetails}',
-
-
   LiveStockInsuranceDetailsCow20= '${formData.LiveStockInsuranceDetailsCow20}',
   LiveStockInsuranceDetailsCow21= '${formData.LiveStockInsuranceDetailsCow21}',
   LiveStockInsuranceDetailsCow22= '${formData.LiveStockInsuranceDetailsCow22}',
@@ -260,37 +250,27 @@ app.post('/submit', (req, res) => {
   LiveStockInsuranceDetailsbuffalo22= '${formData.LiveStockInsuranceDetailsbuffalo22}',
   LiveStockInsuranceDetailsbuffalo23= '${formData.LiveStockInsuranceDetailsbuffalo23}',
   LiveStockInsuranceDetailsbuffalo24= '${formData.LiveStockInsuranceDetailsbuffalo24}',
-
-
-
- LiveStockInsuranceDetailsgoat20= '${formData.LiveStockInsuranceDetailsgoat20}',
- LiveStockInsuranceDetailsgoat21= '${formData.LiveStockInsuranceDetailsgoat21}',
- LiveStockInsuranceDetailsgoat22= '${formData.LiveStockInsuranceDetailsgoat22}',
-LiveStockInsuranceDetailsgoat23= '${formData.LiveStockInsuranceDetailsgoat23}',
-LiveStockInsuranceDetailsgoat24= '${formData.LiveStockInsuranceDetailsgoat24}',
-
-
+  LiveStockInsuranceDetailsgoat20= '${formData.LiveStockInsuranceDetailsgoat20}',
+  LiveStockInsuranceDetailsgoat21= '${formData.LiveStockInsuranceDetailsgoat21}',
+  LiveStockInsuranceDetailsgoat22= '${formData.LiveStockInsuranceDetailsgoat22}',
+  LiveStockInsuranceDetailsgoat23= '${formData.LiveStockInsuranceDetailsgoat23}',
+  LiveStockInsuranceDetailsgoat24= '${formData.LiveStockInsuranceDetailsgoat24}',
   LiveStockInsuranceDetailssheep20= '${formData.LiveStockInsuranceDetailssheep20}',
   LiveStockInsuranceDetailssheep21= '${formData.LiveStockInsuranceDetailssheep21}',
   LiveStockInsuranceDetailssheep22= '${formData.LiveStockInsuranceDetailssheep22}',
   LiveStockInsuranceDetailssheep23= '${formData.LiveStockInsuranceDetailssheep23}',
   LiveStockInsuranceDetailssheep24= '${formData.LiveStockInsuranceDetailssheep24}',
-
   irrigationtyperainfed='${formData.irrigationtyperainfed}',
   irrigationtypeborewell='${formData.irrigationtypeborewell}',
   irrigationtypedrip='${formData.irrigationtypedrip}',
-
-Livestockbuffalow='${formData.Livestockbuffalow}',
-Livestockgoat='${formData.Livestockgoat}',
-Livestocksheep='${formData.Livestocksheep}',
-
-
-
+  Livestockbuffalow='${formData.Livestockbuffalow}',
+  Livestockgoat='${formData.Livestockgoat}',
+  Livestocksheep='${formData.Livestocksheep}',
   LiveStockInsuranceDetailsothers20= '${formData.LiveStockInsuranceDetailsothers20}',
   LiveStockInsuranceDetailsothers21= '${formData.LiveStockInsuranceDetailsothers21}',
   LiveStockInsuranceDetailsothers22= '${formData.LiveStockInsuranceDetailsothers22}',
-LiveStockInsuranceDetailsothers23= '${formData.LiveStockInsuranceDetailsothers23}',
- LiveStockInsuranceDetailsothers24= '${formData.LiveStockInsuranceDetailsothers24}'`;
+  LiveStockInsuranceDetailsothers23= '${formData.LiveStockInsuranceDetailsothers23}',
+  LiveStockInsuranceDetailsothers24= '${formData.LiveStockInsuranceDetailsothers24}'`;
   pool.query(sql, formData, (err, result) => {
     if (err) {
       console.error(err);
@@ -305,5 +285,4 @@ LiveStockInsuranceDetailsothers23= '${formData.LiveStockInsuranceDetailsothers23
 // Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
-
 });
