@@ -7,7 +7,7 @@ require('dotenv').config();
 const app = express();
 app.use(cors());
 
-const port = process.env.PORT || 3020;
+const port = process.env.PORT || 3306;
 
 // MySQL Connection Pool
 const pool = mysql.createPool({
